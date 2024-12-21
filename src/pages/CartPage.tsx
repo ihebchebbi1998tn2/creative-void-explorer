@@ -6,49 +6,62 @@ import TopNavbar from '../components/TopNavbar';
 import { useToast } from "@/hooks/use-toast";
 import Footer from '@/components/Footer';
 import BrandNavbarSection from "@/components/productsPages/BrandNavbarSection";
+import { motion } from "framer-motion";
 
 // Components
 const BackButton = ({ onClick }: { onClick: () => void }) => (
-  <button
+  <motion.button
+    initial={{ x: -20, opacity: 0 }}
+    animate={{ x: 0, opacity: 1 }}
     onClick={onClick}
-    className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors mb-6"
+    className="flex items-center gap-2 text-gray-600 hover:text-black transition-colors mb-6 group"
     aria-label="Go back to home"
   >
-    <ArrowLeft size={24} />
+    <ArrowLeft size={24} className="group-hover:-translate-x-1 transition-transform" />
     <span>Retour à l'accueil</span>
-  </button>
+  </motion.button>
 );
 
 const EmptyCartMessage = ({ onNavigate }: { onNavigate: () => void }) => (
-  <div className="text-center py-16 bg-white rounded-lg shadow-sm">
+  <motion.div 
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="text-center py-16 bg-white rounded-lg shadow-sm"
+  >
     <ShoppingBag className="w-16 h-16 mx-auto mb-4 text-[#8E9196]" />
     <h2 className="text-xl text-[#1A1F2C] mb-4 font-serif">Votre panier est vide</h2>
     <button
       onClick={onNavigate}
-      className="bg-[#700100] text-white px-8 py-3 rounded-md hover:bg-[#591C1C] transition-colors duration-300"
+      className="bg-[#700100] text-white px-8 py-3 rounded-md hover:bg-[#591C1C] transition-colors duration-300 hover:shadow-lg transform hover:-translate-y-0.5"
     >
       Continuer mes achats
     </button>
-  </div>
+  </motion.div>
 );
 
 const CartItemCard = ({ item, onUpdateQuantity, onRemove }) => (
-  <div className="bg-white rounded-lg shadow-sm p-6 transition-all duration-300 hover:shadow-md">
+  <motion.div 
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="bg-white rounded-lg shadow-sm p-6 transition-all duration-300 hover:shadow-md border border-gray-100"
+  >
     <div className="flex items-center gap-6">
-      <div className="w-24 h-24 bg-[#F1F0FB] rounded-md overflow-hidden">
+      <div className="w-24 h-24 bg-[#F1F0FB] rounded-md overflow-hidden group">
         <img
           src={item.image}
           alt={item.name}
-          className="w-full h-full object-contain mix-blend-multiply p-2"
+          className="w-full h-full object-contain mix-blend-multiply p-2 transition-transform duration-300 group-hover:scale-110"
         />
       </div>
       <div className="flex-grow">
-        <h3 className="text-lg font-serif text-[#1A1F2C] mb-1">{item.name}</h3>
+        <h3 className="text-lg font-serif text-[#1A1F2C] mb-1 hover:text-[#700100] transition-colors cursor-pointer">
+          {item.name}
+        </h3>
         <p className="text-[#8E9196] text-sm mb-2">Réf: {item.id.toString().padStart(6, '0')}</p>
         <div className="flex items-center gap-4">
           <button
             onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-            className="text-[#8E9196] hover:text-[#1A1F2C] transition-colors"
+            className="text-[#8E9196] hover:text-[#700100] transition-colors"
             aria-label="Diminuer la quantité"
           >
             <MinusCircle size={20} />
@@ -56,7 +69,7 @@ const CartItemCard = ({ item, onUpdateQuantity, onRemove }) => (
           <span className="w-8 text-center font-medium text-black">{item.quantity}</span>
           <button
             onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-            className="text-[#8E9196] hover:text-[#1A1F2C] transition-colors"
+            className="text-[#8E9196] hover:text-[#700100] transition-colors"
             aria-label="Augmenter la quantité"
           >
             <PlusCircle size={20} />
@@ -69,19 +82,23 @@ const CartItemCard = ({ item, onUpdateQuantity, onRemove }) => (
         </div>
         <button
           onClick={() => onRemove(item.id)}
-          className="text-[#8E9196] hover:text-red-600 transition-colors"
+          className="text-[#8E9196] hover:text-red-600 transition-colors group"
           aria-label="Supprimer l'article"
         >
-          <Trash2 size={20} />
+          <Trash2 size={20} className="group-hover:scale-110 transition-transform" />
         </button>
       </div>
     </div>
-  </div>
+  </motion.div>
 );
 
 const OrderSummary = ({ total, shipping, finalTotal }) => (
-  <div className="lg:col-span-1">
-    <div className="bg-white rounded-lg shadow-sm p-6 sticky top-32">
+  <motion.div 
+    initial={{ opacity: 0, x: 20 }}
+    animate={{ opacity: 1, x: 0 }}
+    className="lg:col-span-1"
+  >
+    <div className="bg-white rounded-lg shadow-sm p-6 sticky top-32 border border-gray-100">
       <h2 className="text-xl font-serif text-[#1A1F2C] mb-6">Résumé de la commande</h2>
       <div className="space-y-4 mb-6">
         <div className="flex justify-between text-[#8E9196]">
@@ -104,14 +121,14 @@ const OrderSummary = ({ total, shipping, finalTotal }) => (
       <div className="space-y-3">
         <button
           onClick={() => console.log('Proceeding with Konnekt payment')}
-          className="w-full bg-[#700100] text-white px-4 py-3 rounded-md hover:bg-[#591C1C] transition-colors duration-300 flex items-center justify-center gap-2"
+          className="w-full bg-[#700100] text-white px-4 py-3 rounded-md hover:bg-[#591C1C] transition-all duration-300 flex items-center justify-center gap-2 hover:shadow-lg transform hover:-translate-y-0.5"
         >
           <CreditCard size={20} />
           Payer avec Konnekt
         </button>
         <button
           onClick={() => console.log('Proceeding with cash payment')}
-          className="w-full border border-[#700100] text-[#700100] px-4 py-3 rounded-md hover:bg-[#F1F0FB] transition-colors duration-300 flex items-center justify-center gap-2"
+          className="w-full border border-[#700100] text-[#700100] px-4 py-3 rounded-md hover:bg-[#F1F0FB] transition-all duration-300 flex items-center justify-center gap-2 hover:shadow-md"
         >
           <Wallet size={20} />
           Payer en espèces
@@ -119,12 +136,18 @@ const OrderSummary = ({ total, shipping, finalTotal }) => (
       </div>
 
       <div className="mt-6 space-y-2 text-sm text-[#8E9196]">
-        <p className="flex items-center gap-2">• Livraison gratuite à partir de 500€</p>
-        <p className="flex items-center gap-2">• Retours gratuits sous 14 jours</p>
-        <p className="flex items-center gap-2">• Service client disponible 24/7</p>
+        <p className="flex items-center gap-2 hover:text-[#1A1F2C] transition-colors">
+          • Livraison gratuite à partir de 500€
+        </p>
+        <p className="flex items-center gap-2 hover:text-[#1A1F2C] transition-colors">
+          • Retours gratuits sous 14 jours
+        </p>
+        <p className="flex items-center gap-2 hover:text-[#1A1F2C] transition-colors">
+          • Service client disponible 24/7
+        </p>
       </div>
     </div>
-  </div>
+  </motion.div>
 );
 
 const CartPage = () => {
@@ -142,6 +165,12 @@ const CartPage = () => {
       toast({
         title: "Panier mis à jour",
         description: "La quantité a été mise à jour avec succès",
+        className: "bg-red-50 border-red-200",
+        style: {
+          backgroundColor: '#700100',
+          color: 'white',
+          border: '1px solid #590000',
+        },
       });
     }
   };
@@ -152,6 +181,12 @@ const CartPage = () => {
       title: "Article supprimé",
       description: "L'article a été retiré du panier",
       variant: "destructive",
+      className: "bg-red-50 border-red-200",
+      style: {
+        backgroundColor: '#700100',
+        color: 'white',
+        border: '1px solid #590000',
+      },
     });
   };
 
@@ -164,9 +199,13 @@ const CartPage = () => {
           <BackButton onClick={() => navigate('/')} />
         </div>
         <div className="container mx-auto px-4 py-12 mt-32">
-          <h1 className="text-3xl font-serif text-[#1A1F2C] mb-8">
+          <motion.h1 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-3xl font-serif text-[#1A1F2C] mb-8"
+          >
             Mon Panier ({cartItems.length} articles)
-          </h1>
+          </motion.h1>
           
           {cartItems.length === 0 ? (
             <EmptyCartMessage onNavigate={() => navigate('/')} />
