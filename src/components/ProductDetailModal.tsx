@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Minus, Plus, ShoppingCart, X } from 'lucide-react';
 import { useCart } from '../components/cart/CartProvider';
 import { useToast } from "@/hooks/use-toast";
+import { playTickSound } from '../utils/audio';
 
 interface ProductDetailModalProps {
   isOpen: boolean;
@@ -37,9 +38,18 @@ const ProductDetailModal = ({ isOpen, onClose, product }: ProductDetailModalProp
       quantity: quantity
     });
 
+    playTickSound();
+
     toast({
       title: "Produit ajouté au panier",
       description: `${quantity} x ${product.name} ajouté avec succès`,
+      duration: 5000, // 5 seconds
+      className: "bg-red-50 border-red-200",
+      style: {
+        backgroundColor: '#700100',
+        color: 'white',
+        border: '1px solid #590000',
+      },
     });
 
     onClose();
