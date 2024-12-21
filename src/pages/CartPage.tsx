@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCart } from '../components/cart/CartProvider';
-import { MinusCircle, PlusCircle, Trash2, CreditCard, Wallet, ShoppingBag, ArrowLeft } from 'lucide-react';
+import { MinusCircle, PlusCircle, Trash2, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import TopNavbar from '../components/TopNavbar';
 import { useToast } from "@/hooks/use-toast";
 import Footer from '@/components/Footer';
 import BrandNavbarSection from "@/components/productsPages/BrandNavbarSection";
 import { motion } from "framer-motion";
+import UserDetailsForm from '@/components/cart/UserDetailsForm';
+import OrderSummary from '@/components/cart/OrderSummary';
+import { UserDetails, getUserDetails } from '@/utils/userDetailsStorage';
 
 // Components
 const BackButton = ({ onClick }: { onClick: () => void }) => (
@@ -92,68 +95,11 @@ const CartItemCard = ({ item, onUpdateQuantity, onRemove }) => (
   </motion.div>
 );
 
-const OrderSummary = ({ total, shipping, finalTotal }) => (
-  <motion.div 
-    initial={{ opacity: 0, x: 20 }}
-    animate={{ opacity: 1, x: 0 }}
-    className="lg:col-span-1"
-  >
-    <div className="bg-white rounded-lg shadow-sm p-6 sticky top-32 border border-gray-100">
-      <h2 className="text-xl font-serif text-[#1A1F2C] mb-6">Résumé de la commande</h2>
-      <div className="space-y-4 mb-6">
-        <div className="flex justify-between text-[#8E9196]">
-          <span>Sous-total</span>
-          <span>€ {total.toFixed(2)}</span>
-        </div>
-        <div className="flex justify-between text-[#8E9196]">
-          <span>Livraison</span>
-          <span>{shipping === 0 ? 'Gratuite' : `€ ${shipping.toFixed(2)}`}</span>
-        </div>
-        <div className="border-t border-gray-100 pt-4">
-          <div className="flex justify-between text-lg font-medium text-[#1A1F2C]">
-            <span>Total</span>
-            <span>€ {finalTotal.toFixed(2)}</span>
-          </div>
-          <p className="text-xs text-[#8E9196] mt-1">TVA incluse</p>
-        </div>
-      </div>
-      
-      <div className="space-y-3">
-        <button
-          onClick={() => console.log('Proceeding with Konnekt payment')}
-          className="w-full bg-[#700100] text-white px-4 py-3 rounded-md hover:bg-[#591C1C] transition-all duration-300 flex items-center justify-center gap-2 hover:shadow-lg transform hover:-translate-y-0.5"
-        >
-          <CreditCard size={20} />
-          Payer avec Konnekt
-        </button>
-        <button
-          onClick={() => console.log('Proceeding with cash payment')}
-          className="w-full border border-[#700100] text-[#700100] px-4 py-3 rounded-md hover:bg-[#F1F0FB] transition-all duration-300 flex items-center justify-center gap-2 hover:shadow-md"
-        >
-          <Wallet size={20} />
-          Payer en espèces
-        </button>
-      </div>
-
-      <div className="mt-6 space-y-2 text-sm text-[#8E9196]">
-        <p className="flex items-center gap-2 hover:text-[#1A1F2C] transition-colors">
-          • Livraison gratuite à partir de 500€
-        </p>
-        <p className="flex items-center gap-2 hover:text-[#1A1F2C] transition-colors">
-          • Retours gratuits sous 14 jours
-        </p>
-        <p className="flex items-center gap-2 hover:text-[#1A1F2C] transition-colors">
-          • Service client disponible 24/7
-        </p>
-      </div>
-    </div>
-  </motion.div>
-);
-
 const CartPage = () => {
   const { cartItems, removeFromCart, updateQuantity } = useCart();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(getUserDetails());
 
   const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const shipping = total > 500 ? 0 : 7;
@@ -190,6 +136,16 @@ const CartPage = () => {
     });
   };
 
+  const handleKonnektPayment = () => {
+    console.log('Processing Konnekt payment');
+    // Implement Konnekt payment logic
+  };
+
+  const handleCashPayment = () => {
+    console.log('Processing cash payment');
+    // Implement cash payment logic
+  };
+
   return (
     <div className="min-h-screen bg-[#F1F0FB]">
       <TopNavbar />
@@ -212,19 +168,30 @@ const CartPage = () => {
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-4">
-                {cartItems.map((item) => (
-                  <CartItemCard
-                    key={item.id}
-                    item={item}
-                    onUpdateQuantity={handleUpdateQuantity}
-                    onRemove={handleRemoveItem}
-                  />
-                ))}
+                <div className="space-y-4">
+                  {cartItems.map((item) => (
+                    <CartItemCard
+                      key={item.id}
+                      item={item}
+                      onUpdateQuantity={handleUpdateQuantity}
+                      onRemove={handleRemoveItem}
+                    />
+                  ))}
+                </div>
+                
+                <UserDetailsForm 
+                  onComplete={setUserDetails}
+                  initialData={userDetails}
+                />
               </div>
+              
               <OrderSummary
                 total={total}
                 shipping={shipping}
                 finalTotal={finalTotal}
+                userDetails={userDetails}
+                onKonnektClick={handleKonnektPayment}
+                onCashClick={handleCashPayment}
               />
             </div>
           )}
